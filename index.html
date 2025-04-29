@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل حرفه ای WireGuard | prx11_WireGuard</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap');
+        
+        :root {
+            --primary: #6e45e2; /* بنفش */
+            --secondary: #88d3ce; /* فیروزه‌ای */
+            --dark: #1a1a2e; /* مشکی تیره */
+            --light: #f1f1f1; /* سفید */
+            --accent: #ff6b6b; /* قرمز */
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 25%, rgba(110, 69, 226, 0.15) 0%, transparent 25%),
+                radial-gradient(circle at 85% 75%, rgba(136, 211, 206, 0.15) 0%, transparent 25%),
+                linear-gradient(135deg, rgba(110, 69, 226, 0.05), rgba(136, 211, 206, 0.05));
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .login-box {
+            background: rgba(26, 26, 46, 0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            text-align: center;
+            transform-style: preserve-3d;
+            transform: perspective(1000px);
+            transition: all 0.4s ease;
+        }
+        
+        .login-box:hover {
+            transform: perspective(1000px) rotateY(4deg) rotateX(4deg);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+        }
+        
+        .login-box h2 {
+            color: var(--secondary);
+            margin-bottom: 30px;
+            font-size: 2rem;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(136, 211, 206, 0.5);
+        }
+        
+        .input-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50px;
+            color: var(--light);
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            cursor: text;
+        }
+        
+        .input-group input:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 15px rgba(136, 211, 206, 0.3);
+        }
+        
+        .input-group label {
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            background: var(--dark);
+            padding: 0 10px;
+            font-size: 0.9rem;
+            color: var(--secondary);
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: var(--dark);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(110, 69, 226, 0.4);
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(4px);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(110, 69, 226, 0.6);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .panel-container {
+            display: none;
+            padding: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--secondary);
+            text-shadow: 0 0 10px rgba(136, 211, 206, 0.5);
+        }
+        
+        .logo span {
+            color: var(--primary);
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 50px;
+            backdrop-filter: blur(8px);
+        }
+        
+        .tab {
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            font-weight: 700;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tab.active {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: var(--dark);
+            box-shadow: 0 5px 15px rgba(110, 69, 226, 0.4);
+            backdrop-filter: blur(4px);
+        }
+        
+        .tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .panel {
+            background: rgba(26, 26, 46, 0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            animation: slideUp 0.5s ease;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .panel h2 {
+            color: var(--secondary);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-shadow: 0 0 8px rgba(136, 211, 206, 0.5);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--secondary);
+            font-weight: 700;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 12px;
+            color: var(--light);
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            cursor: text;
+        }
+        
+        .form-control:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 15px rgba(136, 211, 206, 0.3);
+        }
+        
+        .form-control[readonly] {
+            cursor: not-allowed;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .form-control option {
+            background: var(--dark);
+            color: var(--light);
+        }
+        
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .btn-panel {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: var(--dark);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(110, 69, 226, 0.4);
+            margin-top: 10px;
+            backdrop-filter: blur(4px);
+        }
+        
+        .btn-panel:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(110, 69, 226, 0.6);
+        }
+        
+        .btn-panel:active {
+            transform: translateY(1px);
+        }
+        
+        .telegram-banner {
+            background: linear-gradient(45deg, #0088cc, #00aced);
+            border-radius: 18px;
+            padding: 20px;
+            margin-top: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 10px 20px rgba(0, 136, 204, 0.3);
+            animation: pulseBlue 3s infinite;
+            backdrop-filter: blur(8px);
+        }
+        
+        @keyframes pulseBlue {
+            0% { box-shadow: 0 0 0 0 rgba(0, 136, 204, 0.3); }
+            70% { box-shadow: 0 0 0 15px rgba(0, 136, 204, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 136, 204, 0); }
+        }
+        
+        .telegram-text {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .telegram-icon {
+            font-size: 2.5rem;
+        }
+        
+        .telegram-info h3 {
+            margin-bottom: 5px;
+            font-size: 1.3rem;
+        }
+        
+        .telegram-info p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+        
+        .telegram-btn {
+            background: rgba(255, 255, 255, 0.9);
+            color: #0088cc;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(4px);
+        }
+        
+        .telegram-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 136, 204, 0.4);
+        }
+        
+        .shape {
+            position: absolute;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.3;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            animation: floatShape 8s ease-in-out infinite;
+        }
+        
+        .shape-1 {
+            width: 120px;
+            height: 120px;
+            top: 15%;
+            left: 10%;
+        }
+        
+        .shape-2 {
+            width: 80px;
+            height: 80px;
+            top: 60%;
+            right: 12%;
+            border-radius: 30%;
+        }
+        
+        .shape-3 {
+            width: 100px;
+            height: 100px;
+            bottom: 10%;
+            left: 20%;
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        }
+        
+        @keyframes floatShape {
+            0% { transform: translateY(0) rotate(0deg) scale(1); }
+            50% { transform: translateY(-25px) rotate(10deg) scale(1.1); opacity: 0.5; }
+            100% { transform: translateY(0) rotate(0deg) scale(1); }
+        }
+        
+        .glow {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.25;
+            z-index: -1;
+        }
+        
+        .glow-1 {
+            background: var(--primary);
+            top: 10%;
+            left: 15%;
+        }
+        
+        .glow-2 {
+            background: var(--secondary);
+            bottom: 15%;
+            right: 10%;
+        }
+        
+        @media (max-width: 768px) {
+            .login-box {
+                padding: 30px 20px;
+            }
+            
+            .tabs {
+                flex-direction: column;
+                border-radius: 18px;
+            }
+            
+            .telegram-banner {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Gradient Shapes -->
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+    
+    <!-- Glow effects -->
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    
+    <!-- Login Container -->
+    <div class="login-container" id="loginContainer">
+        <div class="login-box">
+            <h2>ورود به پنل WireGuard</h2>
+            <div class="input-group">
+                <input type="password" id="passwordInput" placeholder="رمز عبور را وارد کنید">
+                <label for="passwordInput">رمز عبور</label>
+            </div>
+            <button class="btn" id="loginBtn">ورود به پنل <i class="fas fa-arrow-left"></i></button>
+            
+            <div style="margin-top: 30px; font-size: 0.9rem; opacity: 0.8;">
+                برای دریافت آخرین کانفیگ‌ها به کانال ما بپیوندید:
+                <div style="margin-top: 10px;">
+                    <a href="https://t.me/proxystore11" target="_blank" style="color: var(--secondary); text-decoration: none; font-weight: bold;">
+                        <i class="fab fa-telegram"></i> proxystore11
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Panel Container -->
+    <div class="panel-container" id="panelContainer">
+        <div class="header">
+            <div class="logo">prx11 <span>WireGuard</span></div>
+            <div class="user-info">
+                <div class="avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span>گیمر پرو</span>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="wireguard">WireGuard</div>
+            <div class="tab" data-tab="dns">DNS</div>
+        </div>
+        
+        <!-- WireGuard Panel -->
+        <div class="panel" id="wireguardPanel">
+            <h2><i class="fas fa-shield-alt"></i> کانفیگ پرو بساز!</h2>
+            <div class="form-group">
+                <label for="configName">اسم کانفیگ</label>
+                <input type="text" id="configName" class="form-control" placeholder="مثال: UltraConfig">
+            </div>
+            <div class="form-group">
+                <label for="country">کشور سرور</label>
+                <select id="country" class="form-control">
+                    <option value="emirates">🇦🇪 امارات</option>
+                    <option value="turkey">🇹🇷 ترکیه</option>
+                    <option value="qatar">🇶🇦 قطر</option>
+                    <option value="germany">🇩🇪 آلمان</option>
+                    <option value="france">🇫🇷 فرانسه</option>
+                    <option value="usa">🇺🇸 آمریکا</option>
+                    <option value="canada">🇨🇦 کانادا</option>
+                    <option value="uk">🇬🇧 انگلیس</option>
+                    <option value="iran">🇮🇷 ایران</option>
+                    <option value="saudi_arabia">🇸🇦 عربستان</option>
+                    <option value="japan">🇯🇵 ژاپن</option>
+                    <option value="china">🇨🇳 چین</option>
+                    <option value="pakistan">🇵🇰 پاکستان</option>
+                    <option value="russia">🇷🇺 روسیه</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="ip_version">نوع IP</label>
+                <select id="ip_version" class="form-control">
+                    <option value="ipv4">IPv4</option>
+                    <option value="ipv6">IPv6</option>
+                    <option value="both" selected>هر دو</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="sim_card">سیم کارت</label>
+                <select id="sim_card" class="form-control">
+                    <option value="hmrah_eol" selected>همراه اول</option>
+                    <option value="Irancell">ایرانسل</option>
+                </select>
+            </div>
+            <button class="btn-panel" id="generateButton"><i class="fas fa-magic"></i> بزن بساز!</button>
+            <div class="form-group" style="margin-top: 20px;">
+                <label for="configText">کانفیگ آماده‌ست!</label>
+                <textarea id="configText" class="form-control" readonly></textarea>
+            </div>
+            <button class="btn-panel" id="saveButton"><i class="fas fa-download"></i> ذخیره کن!</button>
+        </div>
+        
+        <!-- DNS Panel -->
+        <div class="panel" id="dnsPanel" style="display: none;">
+            <h2><i class="fas fa-network-wired"></i> DNS پرو بگیر!</h2>
+            <div class="form-group">
+                <label for="dnsCountry">کشور</label>
+                <select id="dnsCountry" class="form-control">
+                    <option value="emirates">🇦🇪 امارات</option>
+                    <option value="turkey">🇹🇷 ترکیه</option>
+                    <option value="qatar">🇶🇦 قطر</option>
+                    <option value="germany">🇩🇪 آلمان</option>
+                    <option value="france">🇫🇷 فرانسه</option>
+                    <option value="usa">🇺🇸 آمریکا</option>
+                    <option value="canada">🇨🇦 کانادا</option>
+                    <option value="uk">🇬🇧 انگلیس</option>
+                    <option value="iran">🇮🇷 ایران</option>
+                    <option value="saudi_arabia">🇸🇦 عربستان</option>
+                    <option value="japan">🇯🇵 ژاپن</option>
+                    <option value="china">🇨🇳 چین</option>
+                    <option value="pakistan">🇵🇰 پاکستان</option>
+                    <option value="russia">🇷🇺 روسیه</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="dnsIpVersion">نوع IP</label>
+                <select id="dnsIpVersion" class="form-control">
+                    <option value="ipv4">IPv4</option>
+                    <option value="ipv6">IPv6</option>
+                    <option value="both">هر دو</option>
+                </select>
+            </div>
+            <button class="btn-panel" id="generateDNSButton"><i class="fas fa-search"></i> DNS رو بگیر!</button>
+            <div class="form-group" style="margin-top: 20px;">
+                <label for="dnsText">DNS آماده‌ست!</label>
+                <textarea id="dnsText" class="form-control" readonly></textarea>
+            </div>
+            <button class="btn-panel" id="copyDNSButton"><i class="fas fa-copy"></i> کپی کن!</button>
+        </div>
+        
+        <!-- Telegram Banner -->
+        <div class="telegram-banner">
+            <div class="telegram-text">
+                <div class="telegram-icon">
+                    <i class="fab fa-telegram"></i>
+                </div>
+                <div class="telegram-info">
+                    <h3>به کانال تلگرام prx11 بپیوندید</h3>
+                    <p>برای دریافت آخرین کانفیگ‌ها و اطلاعیه‌ها</p>
+                </div>
+            </div>
+            <a href="https://t.me/proxystore11" target="_blank" class="telegram-btn">
+                <i class="fab fa-telegram"></i> عضویت در کانال
+            </a>
+        </div>
+    </div>
+    
+    <script defer>
+        console.log('Script loaded');
+        
+        // Password check
+        try {
+            const loginBtn = document.getElementById('loginBtn');
+            if (loginBtn) {
+                loginBtn.addEventListener('click', () => {
+                    console.log('Login button clicked');
+                    const password = document.getElementById('passwordInput')?.value;
+                    const correctPassword = 'prx11';
+                    
+                    if (password === correctPassword) {
+                        document.getElementById('loginContainer').style.display = 'none';
+                        document.getElementById('panelContainer').style.display = 'block';
+                        console.log('Login successful');
+                    } else {
+                        alert('رمز عبور اشتباه است!');
+                        console.warn('Incorrect password');
+                    }
+                });
+            } else {
+                console.error('Login button not found');
+            }
+        } catch (err) {
+            console.error('Login error:', err);
+            alert('خطا در ورود: ' + err.message);
+        }
+        
+        // Monitor inputs
+        try {
+            document.querySelectorAll('.form-control:not([readonly])').forEach(input => {
+                input.addEventListener('input', () => console.log(`Input ${input.id} changed: ${input.value}`));
+                input.addEventListener('focus', () => console.log(`Input ${input.id} focused`));
+                input.addEventListener('change', () => console.log(`Select ${input.id} changed: ${input.value}`));
+            });
+        } catch (err) {
+            console.error('Input monitoring error:', err);
+        }
+        
+        // Tab switching
+        try {
+            const tabs = document.querySelectorAll('.tab');
+            const panels = document.querySelectorAll('.panel');
+            if (!tabs.length || !panels.length) throw new Error('Tabs or panels not found');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    console.log(`Tab clicked: ${tab.getAttribute('data-tab')}`);
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    panels.forEach(p => p.style.display = 'none');
+                    const panel = document.getElementById(tab.getAttribute('data-tab') + 'Panel');
+                    if (panel) {
+                        panel.style.display = 'block';
+                    } else {
+                        console.error('Panel not found:', tab.getAttribute('data-tab'));
+                    }
+                });
+            });
+        } catch (err) {
+            console.error('Tab switching error:', err);
+            alert('خطا در سوییچ تب: ' + err.message);
+        }
+        
+        // Utility: Random number generator
+        function randomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+        
+        // Generate WireGuard keys
+        function generateWireguardKeys() {
+            try {
+                function getRandomKey() {
+                    const array = new Uint8Array(32);
+                    window.crypto.getRandomValues(array);
+                    return btoa(String.fromCharCode(...array));
+                }
+                return {
+                    privateKey: getRandomKey(),
+                    publicKey: getRandomKey(),
+                    preSharedKey: getRandomKey()
+                };
+            } catch (err) {
+                console.error('Key generation error:', err);
+                alert('خطا در تولید کلیدها: ' + err.message);
+                return null;
+            }
+        }
+        
+        // IP prefixes
+        const ipv4Prefixes = {
+            emirates: '217.199.', turkey: '78.189.', qatar: '37.205.', germany: '185.21.',
+            france: '51.75.', usa: '104.27.', canada: '192.99.', uk: '185.128.',
+            iran: '5.160.', saudi_arabia: '94.74.', japan: '133.242.', china: '232.31.',
+            pakistan: '103.255.', russia: '95.213.'
+        };
+        
+        const ipv6Prefixes = {
+            emirates: '2a01:4f8:1c1c::', turkey: '2a01:4f8:1c1c::', qatar: '2a01:4f8:1c1c::',
+            germany: '2a01:4f8:1c1c::', france: '2a01:4f8:1c1c::', usa: '2600:3c01::',
+            canada: '2600:3c01::', uk: '2a00:1098::', iran: '2a01:4f8:1c1c::',
+            saudi_arabia: '2a01:4f8:1c1c::', japan: '2400:8500::', china: '2400:8500::',
+            pakistan: '2400:8500::', russia: '2a01:4f8:1c1c::'
+        };
+        
+        // IP generators
+        function generateRandomIPv4(prefix) {
+            return prefix + randomInt(0, 255) + '.' + randomInt(0, 255);
+        }
+        
+        function generateRandomIPv6(prefix) {
+            function randHex() {
+                return randomInt(0, 65535).toString(16);
+            }
+            return prefix + randHex() + ':' + randHex() + ':' + randHex();
+        }
+        
+        // DNS generator
+        function generateDNSServers(sim_card) {
+            return sim_card === 'hmrah_eol' ? '10.202.10.10' : sim_card === 'Irancell' ? '78.157.42.100' : '8.8.8.8';
+        }
+        
+        // WireGuard config generator
+        function generateWireguardConfig(country, ip_version, sim_card) {
+            try {
+                const keys = generateWireguardKeys();
+                if (!keys) throw new Error('کلیدها تولید نشدند');
+                
+                const ipv4_prefix = ipv4Prefixes[country];
+                const ipv6_prefix = ipv6Prefixes[country];
+                
+                if (!ipv4_prefix && ip_version !== 'ipv6') throw new Error('کشور برای IPv4 نامعتبره');
+                if (!ipv6_prefix && ip_version !== 'ipv4') throw new Error('کشور برای IPv6 نامعتبره');
+                
+                const ipv4_address = ip_version !== 'ipv6' ? generateRandomIPv4(ipv4_prefix) : '';
+                const ipv6_address = ip_version !== 'ipv4' ? generateRandomIPv6(ipv6_prefix) : '';
+                const endpoint = generateRandomIPv4(ipv4_prefix) + ':51820';
+                const dns_servers = generateDNSServers(sim_card);
+                
+                const address = ip_version === 'ipv4' ? `${ipv4_address}/24` :
+                                ip_version === 'ipv6' ? `${ipv6_address}/64` :
+                                `${ipv4_address}/24, ${ipv6_address}/64`;
+                
+                const config = `# Configuration
+[Interface]
+PrivateKey = ${keys.privateKey}
+Address = ${address}
+DNS = ${dns_servers}
+MTU = 1280
+ListenPort = 51820
+
+[Peer]
+PublicKey = ${keys.publicKey}
+PresharedKey = ${keys.preSharedKey}
+Endpoint = ${endpoint}
+`;
+                console.log('Config generated:', config);
+                return config;
+            } catch (err) {
+                console.error('Config generation error:', err);
+                alert('خطا در تولید کانفیگ: ' + err.message);
+                return '';
+            }
+        }
+        
+        // DNS generator
+        function generateRandomDNS(country, ip_version) {
+            try {
+                const ipv4Prefix = ipv4Prefixes[country];
+                const ipv6Prefix = ipv6Prefixes[country];
+                
+                if (!ipv4Prefix && ip_version !== 'ipv6') throw new Error('کشور برای IPv4 نامعتبره');
+                if (!ipv6Prefix && ip_version !== 'ipv4') throw new Error('کشور برای IPv6 نامعتبره');
+                
+                let dns = ip_version === 'ipv4' ? generateRandomIPv4(ipv4Prefix) :
+                          ip_version === 'ipv6' ? generateRandomIPv6(ipv6Prefix) :
+                          `${generateRandomIPv4(ipv4Prefix)}\n78.157.42.100\n${generateRandomIPv6(ipv6Prefix)}`;
+                
+                console.log('DNS generated:', dns);
+                return dns;
+            } catch (err) {
+                console.error('DNS generation error:', err);
+                alert('خطا در تولید DNS: ' + err.message);
+                return '';
+            }
+        }
+        
+        // Generate config
+        try {
+            const generateButton = document.getElementById('generateButton');
+            if (generateButton) {
+                generateButton.addEventListener('click', () => {
+                    console.log('Generate config clicked');
+                    const country = document.getElementById('country')?.value;
+                    const ip_version = document.getElementById('ip_version')?.value;
+                    const sim_card = document.getElementById('sim_card')?.value;
+                    const configText = document.getElementById('configText');
+                    
+                    if (!country || !ip_version || !sim_card || !configText) {
+                        console.error('Missing inputs:', { country, ip_version, sim_card, configText });
+                        alert('خطا: همه فیلدها رو پر کنید!');
+                        return;
+                    }
+                    
+                    configText.value = generateWireguardConfig(country, ip_version, sim_card);
+                });
+            } else {
+                console.error('Generate button not found');
+            }
+        } catch (err) {
+            console.error('Generate config error:', err);
+            alert('خطا در تولید کانفیگ: ' + err.message);
+        }
+        
+        // Save config
+        try {
+            const saveButton = document.getElementById('saveButton');
+            if (saveButton) {
+                saveButton.addEventListener('click', () => {
+                    console.log('Save config clicked');
+                    const config = document.getElementById('configText')?.value;
+                    const configName = document.getElementById('configName')?.value || 'wireguard-config';
+                    
+                    if (!config?.trim()) {
+                        alert('هیچ کانفیگی نیست! اول بساز!');
+                        console.warn('No config to save');
+                        return;
+                    }
+                    
+                    try {
+                        const blob = new Blob([config], { type: 'text/plain' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `${configName}.conf`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        console.log(`Saved config: ${configName}.conf`);
+                    } catch (err) {
+                        console.error('Save error:', err);
+                        alert('خطا در ذخیره: ' + err.message);
+                    }
+                });
+            } else {
+                console.error('Save button not found');
+            }
+        } catch (err) {
+            console.error('Save config error:', err);
+            alert('خطا در ذخیره کانفیگ: ' + err.message);
+        }
+        
+        // Generate DNS
+        try {
+            const generateDNSButton = document.getElementById('generateDNSButton');
+            if (generateDNSButton) {
+                generateDNSButton.addEventListener('click', () => {
+                    console.log('Generate DNS clicked');
+                    const country = document.getElementById('dnsCountry')?.value;
+                    const ip_version = document.getElementById('dnsIpVersion')?.value;
+                    const dnsText = document.getElementById('dnsText');
+                    
+                    if (!country || !ip_version || !dnsText) {
+                        console.error('Missing DNS inputs:', { country, ip_version, dnsText });
+                        alert('خطا: همه فیلدها رو پر کنید!');
+                        return;
+                    }
+                    
+                    dnsText.value = generateRandomDNS(country, ip_version);
+                });
+            } else {
+                console.error('Generate DNS button not found');
+            }
+        } catch (err) {
+            console.error('Generate DNS error:', err);
+            alert('خطا در تولید DNS: ' + err.message);
+        }
+        
+        // Copy DNS
+        try {
+            const copyDNSButton = document.getElementById('copyDNSButton');
+            if (copyDNSButton) {
+                copyDNSButton.addEventListener('click', () => {
+                    console.log('Copy DNS clicked');
+                    const dns = document.getElementById('dnsText')?.value;
+                    
+                    if (!dns?.trim()) {
+                        alert('چیزی برای کپی نیست!');
+                        console.warn('No DNS to copy');
+                        return;
+                    }
+                    
+                    navigator.clipboard.writeText(dns).then(() => {
+                        alert('DNS کپی شد! بتاز!');
+                        console.log('DNS copied:', dns);
+                    }).catch(err => {
+                        console.error('Copy error:', err);
+                        alert('خطا در کپی: ' + err.message);
+                    });
+                });
+            } else {
+                console.error('Copy DNS button not found');
+            }
+        } catch (err) {
+            console.error('Copy DNS error:', err);
+            alert('خطا در کپی DNS: ' + err.message);
+        }
+        
+        // Create particles
+        try {
+            const container = document.createElement('div');
+            container.className = 'particles';
+            const shapes = ['circle', 'square', 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)'];
+            for (let i = 0; i < 60; i++) {
+                const particle = document.createElement('div');
+                particle.style.position = 'absolute';
+                particle.style.width = Math.random() * 6 + 3 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.background = 'linear-gradient(45deg, rgba(110, 69, 226, 0.5), rgba(136, 211, 206, 0.5))';
+                particle.style.borderRadius = shapes[Math.floor(Math.random() * shapes.length)] === 'circle' ? '50%' : '0';
+                particle.style.clipPath = shapes[Math.floor(Math.random() * shapes.length)] !== 'circle' ? shapes[Math.floor(Math.random() * shapes.length)] : '';
+                particle.style.top = Math.random() * 100 + 'vh';
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.animation = `floatShape ${Math.random() * 12 + 6}s infinite ease-in-out`;
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                container.appendChild(particle);
+            }
+            document.body.appendChild(container);
+            console.log('Particles created');
+        } catch (err) {
+            console.error('Particle error:', err);
+        }
+    </script>
+</body>
+</html>
