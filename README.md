@@ -1,6 +1,5 @@
 # prx11-WireGuard
 ‌‌WireGuard &amp; DNS
-# prx11 WireGuard
 پنل حرفه‌ای برای مدیریت کانفیگ‌های WireGuard با تم شیشه‌ای و بلوری.
 
 ## ویژگی‌ها
