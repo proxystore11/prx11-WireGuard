@@ -18,7 +18,7 @@
 - اتصال اینترنت برای لود فونت‌ها (Tajawal)، آیکون‌ها (Font Awesome)، و بنر Coffeebede.
 
 ## استفاده
-1. **ورود**: از رمز `esmail` برای دسترسی به پنل استفاده کنید.
+1. **ورود**: از رمز `prx11` برای دسترسی به پنل استفاده کنید.
 2. **تولید کانفیگ WireGuard**:
    - توی تب **WireGuard**، اسم کانفیگ (مثل `UltraConfig`) وارد کنید.
    - کشور، نوع IP، و سیم‌کارت رو انتخاب کنید.
@@ -35,4 +35,6 @@
 
 ## حمایت
 از پروژه ما با بازدید از لینک زیر حمایت کنید:
+
+
 <a href="https://www.coffeebede.com/miladfaryad1"><img class="img-fluid" src="https://coffeebede.ir/DashboardTemplateV2/app-assets/images/banner/default-yellow.svg" alt="Coffeebede Ad" /></a>
